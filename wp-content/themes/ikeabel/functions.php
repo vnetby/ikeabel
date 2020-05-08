@@ -15,14 +15,14 @@ require(dirname(__FILE__) . '/inc/globals.php');
 
 if (function_exists('acf_add_options_page')) {
 
-	acf_add_options_page(array(
-		'page_title' 	=> 'Настройки доставки и калькулятора',
-		'menu_title'	=> 'Доставка',
-		'menu_slug' 	=> 'shipping_settings',
-		'capability'	=> 'edit_posts',
-		'redirect'		=> false,
-		'icon_url' => 'dashicons-archive'
-	));
+  acf_add_options_page(array(
+    'page_title'   => 'Настройки доставки и калькулятора',
+    'menu_title'  => 'Доставка',
+    'menu_slug'   => 'shipping_settings',
+    'capability'  => 'edit_posts',
+    'redirect'    => false,
+    'icon_url' => 'dashicons-archive'
+  ));
 }
 
 
@@ -32,42 +32,42 @@ if (function_exists('acf_add_options_page')) {
 
 function send_order_data()
 {
-	$data = json_decode(stripslashes($_POST['data']), true);
-	$sets = get_calc_settings();
+  $data = json_decode(stripslashes($_POST['data']), true);
+  $sets = get_calc_settings();
 
-	$name    = get_from_array($data, 'name');
-	$phone   = get_from_array($data, 'phone');
-	$email   = get_from_array($data, 'email');
-	$address = get_from_array($data, 'address');
+  $name    = get_from_array($data, 'name');
+  $phone   = get_from_array($data, 'phone');
+  $email   = get_from_array($data, 'email');
+  $address = get_from_array($data, 'address');
 
-	$errors = [];
+  $errors = [];
 
-	if (!$name) $errors[]    = 'name';
-	if (!$phone) $errors[]   = 'phone';
-	if (!$email) $errors[]   = 'email';
-	if (!$address) $errors[] = 'address';
+  if (!$name) $errors[]    = 'name';
+  if (!$phone) $errors[]   = 'phone';
+  if (!$email) $errors[]   = 'email';
+  if (!$address) $errors[] = 'address';
 
-	if (count($errors)) {
-		the_response_json(['type' => 'error', 'inputs' => $errors, 'msg' => $sets['MESS']['required_field']]);
-	}
+  if (count($errors)) {
+    the_response_json(['type' => 'error', 'inputs' => $errors, 'msg' => $sets['MESS']['required_field']]);
+  }
 
-	ob_start();
-	require(dirname(__FILE__) . '/calculator-templates/template_email_admin.php');
-	$admin_email = ob_get_clean();
+  ob_start();
+  require(dirname(__FILE__) . '/calculator-templates/template_email_admin.php');
+  $admin_email = ob_get_clean();
 
-	ob_start();
-	require(dirname(__FILE__) . '/calculator-templates/template_email_client.php');
-	$client_email = ob_get_clean();
+  ob_start();
+  require(dirname(__FILE__) . '/calculator-templates/template_email_client.php');
+  $client_email = ob_get_clean();
 
 
-	$headers = "From: " . $sets['admin_email'] . "\r\n";
-	$headers .= "Content-Type: text/html; charset=UTF-8\r\n";
+  $headers = "From: " . $sets['admin_email'] . "\r\n";
+  $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
 
-	mail($sets['admin_email'], "Заказ с сайта", $admin_email, $headers);
-	mail($email, "Детали заказа", $client_email, $headers);
+  mail($sets['admin_email'], "Заказ с сайта", $admin_email, $headers);
+  mail($email, "Детали заказа", $client_email, $headers);
 
-	the_response_json(['type' => 'success']);
-	exit;
+  the_response_json(['type' => 'success']);
+  exit;
 }
 
 
@@ -77,8 +77,8 @@ function send_order_data()
 
 function the_response_json($arr)
 {
-	echo json_encode($arr);
-	exit;
+  echo json_encode($arr);
+  exit;
 }
 
 
@@ -88,7 +88,7 @@ function the_response_json($arr)
 
 function parse_site()
 {
-	$id_product   = $_POST['link'];
+  $id_product   = $_POST['link'];
   $res          = array();
   $res['error'] = '0';
 
@@ -110,7 +110,7 @@ function parse_site()
     exit;
   }
 
-  preg_match("/<[\s]*script[\s]*type[\s]*=[\s]*\"[\s]*application\/ld\+json[\s]*\"[\s]*>(.*?)<\/script>/us", $output, $matches);
+  preg_match("/<script[\s]+type[\s]*=[\s]*\"application\/ld\+json[\s]*\"[^>]*>(.*?)<\/script>/us", $output, $matches);
 
   if (!isset($matches[1])) {
     $res['error'] = 1;
@@ -126,14 +126,14 @@ function parse_site()
     exit;
   }
 
-	// print_r ($data);
-	// exit;
+  // print_r ($data);
+  // exit;
 
   $offers = get_from_array($data, 'offers');
   $ruPrice = get_from_array($offers, 'price');
-	if (!$ruPrice) {
-		$ruPrice = get_from_array($offers, 'lowPrice');
-	}
+  if (!$ruPrice) {
+    $ruPrice = get_from_array($offers, 'lowPrice');
+  }
   if ($ruPrice) {
     $res['cost'] = round((float) $ruPrice * $course, 2);
   }
@@ -142,12 +142,12 @@ function parse_site()
   $images = get_from_array($data, 'image');
 
   if (is_array($images)) {
-    if (isset ($images[0])) {
+    if (isset($images[0])) {
       $res['image'] = $images[0];
     }
   }
 
-  $res['prodId'] = get_from_array($data,'sku');
+  $res['prodId'] = get_from_array($data, 'sku');
 
 
   // $doc = new DOMDocument();
@@ -206,10 +206,10 @@ function parse_site()
 
 function get_cacl_settings_ajax()
 {
-	$settings = get_calc_settings();
-	if (!$settings) exit;
-	echo json_encode($settings);
-	exit;
+  $settings = get_calc_settings();
+  if (!$settings) exit;
+  echo json_encode($settings);
+  exit;
 }
 
 
@@ -217,29 +217,29 @@ function get_cacl_settings_ajax()
 
 function get_calc_settings()
 {
-	$tarifs = get_field('ship_tarifs', 'option');
-	$settings = get_field('calc_settings', 'option');
-	$mess = get_field('calc_messages', 'option');
+  $tarifs = get_field('ship_tarifs', 'option');
+  $settings = get_field('calc_settings', 'option');
+  $mess = get_field('calc_messages', 'option');
 
-	if (!is_array($tarifs) || !is_array($settings) || !is_array($settings))  return false;
+  if (!is_array($tarifs) || !is_array($settings) || !is_array($settings))  return false;
 
-	$settings['prices'] = [];
-	$settings['prices']['ikeai_shipping_price_start'] = array_column($tarifs, 'from');
-	$settings['prices']['ikeai_shipping_price_end'] = array_column($tarifs, 'to');
-	$settings['prices']['ikeai_shipping_price_percent'] = array_column($tarifs, 'percent');
+  $settings['prices'] = [];
+  $settings['prices']['ikeai_shipping_price_start'] = array_column($tarifs, 'from');
+  $settings['prices']['ikeai_shipping_price_end'] = array_column($tarifs, 'to');
+  $settings['prices']['ikeai_shipping_price_percent'] = array_column($tarifs, 'percent');
 
-	$settings['MESS'] = $mess;
+  $settings['MESS'] = $mess;
 
-	$settings['SRC'] = CURRENT_SRC;
-	return $settings;
+  $settings['SRC'] = CURRENT_SRC;
+  return $settings;
 }
 
 
 function ikea_get_tarifs()
 {
-	$tarifs = get_field('ship_tarifs', 'options');
-	if (!is_array($tarifs)) return false;
-	return $tarifs;
+  $tarifs = get_field('ship_tarifs', 'options');
+  if (!is_array($tarifs)) return false;
+  return $tarifs;
 }
 
 
@@ -249,21 +249,21 @@ function ikea_get_tarifs()
 
 function get_page_head_sets(&$post)
 {
-	$head = get_field('page_header', $post->ID);
-	$title = false;
-	$subtitle = false;
-	$bg = false;
-	if ($head) {
-		$title = get_from_array($head, 'title');
-		$subtitle = get_from_array($head, 'subtitle');
-		$bg = get_from_array($head, 'bg');
-	}
-	$title = $title ? $title : $post->post_title;
-	$bg = $bg ? $bg : get_the_post_thumbnail_url($post->ID);
-	return [
-		'title' => $title,
-		'subtitle' => $subtitle,
-		'breadcrumbs' => true,
-		'bg' => $bg
-	];
+  $head = get_field('page_header', $post->ID);
+  $title = false;
+  $subtitle = false;
+  $bg = false;
+  if ($head) {
+    $title = get_from_array($head, 'title');
+    $subtitle = get_from_array($head, 'subtitle');
+    $bg = get_from_array($head, 'bg');
+  }
+  $title = $title ? $title : $post->post_title;
+  $bg = $bg ? $bg : get_the_post_thumbnail_url($post->ID);
+  return [
+    'title' => $title,
+    'subtitle' => $subtitle,
+    'breadcrumbs' => true,
+    'bg' => $bg
+  ];
 }
